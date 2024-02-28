@@ -1,31 +1,17 @@
 package main
 
 import (
-	"encoding/json"
+	"context"
 	"fmt"
-	"net/http"
 
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
+	"github.com/Pranshu321/orders-api.git/application"
 )
 
 func main() {
-	router := chi.NewRouter()
-	router.Use(middleware.Logger)
-
-	router.Get("/", basicHandler)
-	server := &http.Server{
-		Addr:    ":3000",
-		Handler: router,
-	}
-
-	err := server.ListenAndServe()
+	fmt.Println("Starting the application...")
+	app := application.New()
+	err := app.Start(context.TODO())
 	if err != nil {
-		fmt.Println("failed to listen to server", err)
+		fmt.Printf("Error starting the application: %s\n", err)
 	}
-	fmt.Println("server started")
-}
-
-func basicHandler(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode("{message: Hello, World!}")
 }
