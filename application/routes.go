@@ -1,6 +1,7 @@
 package application
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/Pranshu321/orders-api.git/handler"
@@ -12,7 +13,9 @@ func loadRoutes() *chi.Mux {
 	router := chi.NewRouter()
 	router.Use(middleware.Logger)
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello, World!"))
+		w.Header().Set("Content-Type", "application/json")
+		message := "Welcome to the orders api"
+		json.NewEncoder(w).Encode(map[string]string{"message": message})
 	})
 	router.Route("/orders", loadOrderRoutes)
 	return router
