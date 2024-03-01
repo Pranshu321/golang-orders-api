@@ -3,13 +3,15 @@ package controller
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/Pranshu321/orders-api.git/models"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-const connectionString = "mongodb+srv://pranshujain0221:abc%40123@richpanel-assingment.rplhf7o.mongodb.net/?retryWrites=true&w=majority"
+// const connectionString = "mongodb+srv://pranshujain0221:abc%40123@richpanel-assingment.rplhf7o.mongodb.net/?retryWrites=true&w=majority"
 
 const dbName = "Microservices"
 const collName = "Orders"
@@ -18,6 +20,11 @@ const collName = "Orders"
 var collection *mongo.Collection
 
 func Connect() error {
+	EnvErr := godotenv.Load()
+	if EnvErr != nil {
+		fmt.Println("Error loading .env file")
+	}
+	var connectionString = os.Getenv("MONGO_KEY")
 	fmt.Println("Connecting to MongoDB...")
 	clientOptions := options.Client().ApplyURI(connectionString)
 	client, err := mongo.Connect(context.Background(), clientOptions)
@@ -48,13 +55,14 @@ func FindById(id uint64) (models.Order, error) {
 	return order, nil
 }
 
-func Delete(id uint64) error {
+func Delete(id uint64) int {
 	filter := map[string]interface{}{"_id": id}
-	_, err := collection.DeleteOne(context.Background(), filter)
-	if err != nil {
-		return fmt.Errorf("Order Not Exist: %s", err)
+	document, _ := collection.DeleteOne(context.Background(), filter)
+	// fmt.Println("Count", document.DeletedCount)
+	if document.DeletedCount == 0 {
+		return -1
 	}
-	return nil
+	return 0
 }
 
 func FindAll() ([]models.Order, error) {

@@ -122,8 +122,8 @@ func (o *Order) Update(w http.ResponseWriter, r *http.Request) {
 		CreatedAt:  prevorder.CreatedAt,
 	}
 
-	err = controller.Update(order)
-	if err != nil {
+	newerr := controller.Update(order)
+	if newerr != nil {
 		http.Error(w, "failed to update order", http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -147,14 +147,13 @@ func (o *Order) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "invalid order id", http.StatusBadRequest)
 		w.WriteHeader(http.StatusBadRequest)
-		return
 	}
-	err = controller.Delete(orderId)
-	if err != nil {
+	delCount := controller.Delete(orderId)
+	if delCount < 0 {
 		http.Error(w, "failed to delete order", http.StatusInternalServerError)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	w.WriteHeader(http.StatusNoContent)
 	json.NewEncoder(w).Encode("Order Deleted")
+	w.WriteHeader(http.StatusOK)
 }
