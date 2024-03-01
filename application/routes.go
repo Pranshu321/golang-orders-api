@@ -17,6 +17,7 @@ func loadRoutes() *chi.Mux {
 		message := "Welcome to the orders api"
 		json.NewEncoder(w).Encode(map[string]string{"message": message})
 	})
+
 	router.Route("/orders", loadOrderRoutes)
 	return router
 }
